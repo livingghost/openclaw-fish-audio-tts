@@ -1,0 +1,30 @@
+{
+  "id": "fish-audio-tts",
+  "name": "Fish Audio TTS",
+  "description": "OpenClaw speech provider plugin for Fish Audio TTS.",
+  "providers": ["fish-audio"],
+  "providerAuthEnvVars": {
+    "fish-audio": ["FISH_AUDIO_API_KEY"]
+  },
+  "providerAuthChoices": [
+    {
+      "provider": "fish-audio",
+      "method": "api-key",
+      "choiceId": "fish-audio-api-key",
+      "choiceLabel": "Fish Audio API key",
+      "groupId": "fish-audio",
+      "groupLabel": "Fish Audio",
+      "cliFlag": "--fish-audio-api-key",
+      "cliOption": "--fish-audio-api-key <key>",
+      "cliDescription": "Fish Audio API key"
+    }
+  ],
+  "contracts": {
+    "speechProviders": ["fish-audio"]
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}
