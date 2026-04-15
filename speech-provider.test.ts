@@ -117,11 +117,40 @@ describe("Fish Audio speech provider", () => {
     expect(voiceNoteBody).toMatchObject({
       format: "opus",
       sample_rate: 48000,
-      opus_bitrate: 32,
+      opus_bitrate: 32000,
     });
     expect(telephonyBody).toMatchObject({
       format: "pcm",
       sample_rate: 8000,
+    });
+  });
+
+  it("accepts legacy opus bitrate values in kbps-style config and sends API values in bps", async () => {
+    const provider = buildFishAudioSpeechProvider();
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(() =>
+        Promise.resolve(new Response(Buffer.from("audio"), { status: 200 })),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await provider.synthesize?.({
+      text: "hello",
+      cfg: {} as never,
+      providerConfig: {
+        apiKey: "token",
+        voiceId: "voice-demo-01",
+        model: "s2-pro",
+        opusBitrate: 32,
+      },
+      target: "voice-note",
+      timeoutMs: 1000,
+    });
+
+    const voiceNoteBody = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body));
+    expect(voiceNoteBody).toMatchObject({
+      format: "opus",
+      opus_bitrate: 32000,
     });
   });
 

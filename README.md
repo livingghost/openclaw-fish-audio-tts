@@ -147,26 +147,26 @@ spoken text when the target voice/model supports them.
 
 ## Config reference
 
-| Key                         | Type      | Default                  | Notes                                                                     |
-| --------------------------- | --------- | ------------------------ | ------------------------------------------------------------------------- |
-| `apiKey`                    | `string`  | unset                    | Falls back to `FISH_AUDIO_API_KEY`.                                       |
-| `baseUrl`                   | `string`  | `https://api.fish.audio` | Trailing slash is removed automatically.                                  |
-| `voiceId`                   | `string`  | unset                    | Maps to Fish Audio single-speaker `reference_id`. Required for synthesis. |
-| `model`                     | `string`  | `s2-pro`                 | Supported values are listed below.                                        |
-| `latency`                   | `string`  | `normal`                 | `low`, `normal`, `balanced`.                                              |
-| `speed`                     | `number`  | provider default         | Allowed range is `0.5` to `2.0`.                                          |
-| `temperature`               | `number`  | provider default         | Allowed range is `0` to `1`.                                              |
-| `topP`                      | `number`  | provider default         | Allowed range is `0` to `1`.                                              |
-| `normalize`                 | `boolean` | provider default         | Maps to Fish Audio text normalization.                                    |
-| `chunkLength`               | `number`  | provider default         | Allowed range is `100` to `300`.                                          |
-| `sampleRate`                | `number`  | target-dependent         | Allowed sample rates depend on format.                                    |
-| `mp3Bitrate`                | `number`  | `128`                    | Only applies when format is `mp3`.                                        |
-| `opusBitrate`               | `number`  | `32`                     | Only applies when format is `opus`.                                       |
-| `maxNewTokens`              | `number`  | provider default         | Optional generation cap per chunk.                                        |
-| `repetitionPenalty`         | `number`  | provider default         | Optional repetition control.                                              |
-| `minChunkLength`            | `number`  | provider default         | Allowed range is `0` to `100`.                                            |
-| `conditionOnPreviousChunks` | `boolean` | provider default         | Keeps voice consistency across chunks.                                    |
-| `earlyStopThreshold`        | `number`  | provider default         | Allowed range is `0` to `1`.                                              |
+| Key                         | Type      | Default                  | Notes                                                                                                                                           |
+| --------------------------- | --------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `apiKey`                    | `string`  | unset                    | Falls back to `FISH_AUDIO_API_KEY`.                                                                                                             |
+| `baseUrl`                   | `string`  | `https://api.fish.audio` | Trailing slash is removed automatically.                                                                                                        |
+| `voiceId`                   | `string`  | unset                    | Maps to Fish Audio single-speaker `reference_id`. Required for synthesis.                                                                       |
+| `model`                     | `string`  | `s2-pro`                 | Supported values are listed below.                                                                                                              |
+| `latency`                   | `string`  | `normal`                 | `low`, `normal`, `balanced`.                                                                                                                    |
+| `speed`                     | `number`  | provider default         | Allowed range is `0.5` to `2.0`.                                                                                                                |
+| `temperature`               | `number`  | provider default         | Allowed range is `0` to `1`.                                                                                                                    |
+| `topP`                      | `number`  | provider default         | Allowed range is `0` to `1`.                                                                                                                    |
+| `normalize`                 | `boolean` | provider default         | Maps to Fish Audio text normalization.                                                                                                          |
+| `chunkLength`               | `number`  | provider default         | Allowed range is `100` to `300`.                                                                                                                |
+| `sampleRate`                | `number`  | target-dependent         | Allowed sample rates depend on format.                                                                                                          |
+| `mp3Bitrate`                | `number`  | `128`                    | Only applies when format is `mp3`.                                                                                                              |
+| `opusBitrate`               | `number`  | `32`                     | Only applies when format is `opus`. `32`/`48` style kbps values are accepted and normalized to the Fish API's `32000`/`48000` style bps values. |
+| `maxNewTokens`              | `number`  | provider default         | Optional generation cap per chunk.                                                                                                              |
+| `repetitionPenalty`         | `number`  | provider default         | Optional repetition control.                                                                                                                    |
+| `minChunkLength`            | `number`  | provider default         | Allowed range is `0` to `100`.                                                                                                                  |
+| `conditionOnPreviousChunks` | `boolean` | provider default         | Keeps voice consistency across chunks.                                                                                                          |
+| `earlyStopThreshold`        | `number`  | provider default         | Allowed range is `0` to `1`.                                                                                                                    |
 
 ## Supported values
 
@@ -181,6 +181,14 @@ spoken text when the target voice/model supports them.
 - `opus`
 - `wav`
 - `pcm`
+
+### Opus bitrates
+
+- `-1000` (`auto`)
+- `24` or `24000`
+- `32` or `32000`
+- `48` or `48000`
+- `64` or `64000`
 
 ### Sample rates
 

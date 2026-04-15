@@ -122,4 +122,32 @@ describe("Fish Audio TTS client", () => {
       }),
     ).rejects.toThrow("unsupported Fish Audio sampleRate 44100 for opus");
   });
+
+  it("normalizes legacy opus bitrate values before calling the API", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(Buffer.from("audio"), {
+        status: 200,
+        headers: { "content-type": "audio/ogg" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await fishAudioTTS({
+      text: "Hello from OpenClaw",
+      apiKey: "test-token",
+      voiceId: "voice-demo-01",
+      model: "s2-pro",
+      format: "opus",
+      sampleRate: 48000,
+      opusBitrate: 32,
+      timeoutMs: 1000,
+    });
+
+    const [, requestInit] = fetchMock.mock.calls[0] ?? [];
+    expect(JSON.parse(String((requestInit as RequestInit).body))).toMatchObject({
+      format: "opus",
+      sample_rate: 48000,
+      opus_bitrate: 32000,
+    });
+  });
 });

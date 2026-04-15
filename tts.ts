@@ -11,7 +11,13 @@ const FISH_AUDIO_MODELS = new Set(["s1", "s2-pro"] as const);
 const FISH_AUDIO_FORMATS = new Set(["mp3", "opus", "wav", "pcm"] as const);
 const FISH_AUDIO_LATENCIES = new Set(["low", "normal", "balanced"] as const);
 const MP3_BITRATES = new Set([64, 128, 192]);
-const OPUS_BITRATES = new Set([-1000, 24, 32, 48, 64]);
+const OPUS_BITRATES = new Set([-1000, 24000, 32000, 48000, 64000]);
+const OPUS_BITRATE_ALIASES = new Map([
+  [24, 24000],
+  [32, 32000],
+  [48, 48000],
+  [64, 64000],
+]);
 const SAMPLE_RATES_BY_FORMAT = {
   mp3: new Set([32000, 44100]),
   opus: new Set([48000]),
@@ -140,6 +146,19 @@ async function extractFishAudioErrorDetail(response: Response): Promise<string |
   }
 }
 
+function normalizeFishAudioOpusBitrate(opusBitrate: number | undefined): number | undefined {
+  if (opusBitrate == null) {
+    return undefined;
+  }
+  const normalized = OPUS_BITRATE_ALIASES.get(opusBitrate) ?? opusBitrate;
+  if (!OPUS_BITRATES.has(normalized)) {
+    throw new Error(
+      `unsupported Fish Audio opusBitrate "${opusBitrate}" (allowed: -1000, 24/24000, 32/32000, 48/48000, 64/64000)`,
+    );
+  }
+  return normalized;
+}
+
 function assertFishAudioRequest(params: FishAudioTTSRequest): void {
   if (!params.text.trim()) {
     throw new Error("Fish Audio TTS text is empty");
@@ -165,9 +184,7 @@ function assertFishAudioRequest(params: FishAudioTTSRequest): void {
   if (params.mp3Bitrate != null && !MP3_BITRATES.has(params.mp3Bitrate)) {
     throw new Error(`unsupported Fish Audio mp3Bitrate "${params.mp3Bitrate}"`);
   }
-  if (params.opusBitrate != null && !OPUS_BITRATES.has(params.opusBitrate)) {
-    throw new Error(`unsupported Fish Audio opusBitrate "${params.opusBitrate}"`);
-  }
+  normalizeFishAudioOpusBitrate(params.opusBitrate);
   if (params.speed != null) {
     requireInRange(params.speed, 0.5, 2, "speed");
   }
@@ -255,6 +272,7 @@ export async function listFishAudioVoices(params: {
 
 export async function fishAudioTTS(params: FishAudioTTSRequest): Promise<Buffer> {
   assertFishAudioRequest(params);
+  const normalizedOpusBitrate = normalizeFishAudioOpusBitrate(params.opusBitrate);
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), params.timeoutMs);
@@ -278,7 +296,7 @@ export async function fishAudioTTS(params: FishAudioTTSRequest): Promise<Buffer>
         ...(params.normalize == null ? {} : { normalize: params.normalize }),
         ...(params.sampleRate == null ? {} : { sample_rate: params.sampleRate }),
         ...(params.mp3Bitrate == null ? {} : { mp3_bitrate: params.mp3Bitrate }),
-        ...(params.opusBitrate == null ? {} : { opus_bitrate: params.opusBitrate }),
+        ...(normalizedOpusBitrate == null ? {} : { opus_bitrate: normalizedOpusBitrate }),
         ...(params.latency == null ? {} : { latency: params.latency }),
         ...(params.maxNewTokens == null ? {} : { max_new_tokens: params.maxNewTokens }),
         ...(params.repetitionPenalty == null
